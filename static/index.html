@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorSAR - SAR Image Colorization</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Color<span>SAR</span></h1>
+            <p>Artificial Intelligence for Synthetic Aperture Radar Image Colorization</p>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div id="drop-zone" class="drop-zone">
+                    <div class="icon">📁</div>
+                    <p>Drag & Drop SAR Image or <span>Browse</span></p>
+                    <input type="file" id="file-input" hidden accept="image/*">
+                </div>
+                <button id="colorize-btn" disabled>Colorize Image</button>
+            </div>
+
+            <div class="result-section" id="result-section" style="display: none;">
+                <div class="preview-container">
+                    <div class="preview-box">
+                        <h3>Monochromatic SAR</h3>
+                        <img id="input-preview" src="#" alt="Input Preview">
+                    </div>
+                    <div class="preview-box">
+                        <h3>Colorized Result</h3>
+                        <div id="loader" class="loader"></div>
+                        <img id="output-preview" src="#" alt="Colorized Result">
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 ColorSAR - Synthetic Aperture Radar Colorization Model</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

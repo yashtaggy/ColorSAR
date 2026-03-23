@@ -126,21 +126,4 @@ We have evaluated on the following metrics:
 - Pillow
 - Scipy Image
 
-## Contributors
-We thank the following people for their contributions to this project:
-- [Nishchay Rajput](https://github.com/NishchayRajput)
-- [Ojus Goel](https://github.com/ojusgoel)
-- [Janmay Patel](https://github.com/janmay2910)
-- [Aditya Bajpai](https://github.com/Aditya-117)
-- [Nishant Verma](https://github.com/nishant9083)
 
-
-## Acknowledgment
-This project utilizes concepts and techniques from the following paper:
-
-**Automatic Image Colorization using Ensemble of Deep Convolutional Neural Networks**  
-Urvi Oza\*, Arpit Pipara†, Srimanta Mandal‡, and Pankaj Kumar§  
-\*†‡ Dhirubhai Ambani Institute of Information Communication Technology (DAIICT), Gandhinagar, India  
-\*201921009@daiict.ac.in, †201911030@daiict.ac.in, ‡in.srimanta.mandal@ieee.org  
-§ University of Petroleum and Energy Studies (UPES), Bidholi, Dehradun, India  
-pankaj.k@ddn.upes.ac.in

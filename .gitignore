@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+env/
+.venv/
+venv/
+build/
+dist/
+
+# PyTorch Models (Crucial to ignore large files)
+*.pth
+*.pt
+
+# Application Temp Files
+temp_input.png
+*.log
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+v_2
+
