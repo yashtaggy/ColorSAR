@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,20 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1>Color<span>SAR</span></h1>
             <p>Artificial Intelligence for Synthetic Aperture Radar Image Colorization</p>
         </header>
+
+        <section class="about-section">
+            <p><strong>ColorSAR</strong> is an advanced AI system designed to transform monochromatic SAR imagery into
+                realistic optical-style color data. Utilizing a <strong>Deep Ensemble Decoder</strong> (combining
+                ResNet-50 and DenseNet-121) and trained via <strong>Conditional GANs</strong>, it meticulously predicts
+                spectral channels while retaining 100% of the original radar texture.</p>
+        </section>
 
         <main>
             <div class="upload-section">
@@ -34,6 +43,7 @@
                         <h3>Colorized Result</h3>
                         <div id="loader" class="loader"></div>
                         <img id="output-preview" src="#" alt="Colorized Result">
+                        <a id="download-btn" class="download-link" style="display: none;">Download Reconstruction</a>
                     </div>
                 </div>
             </div>
@@ -45,4 +55,5 @@
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>

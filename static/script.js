@@ -48,13 +48,17 @@ function handleFile(file) {
     }
 }
 
+const downloadBtn = document.getElementById('download-btn');
+
 colorizeBtn.onclick = async () => {
     if (!currentFile) return;
 
     // Show loader
     loader.style.display = 'block';
     outputPreview.style.display = 'none';
+    downloadBtn.style.display = 'none';
     colorizeBtn.disabled = true;
+    colorizeBtn.textContent = 'Processing...';
 
     const formData = new FormData();
     formData.append('file', currentFile);
@@ -70,14 +74,27 @@ colorizeBtn.onclick = async () => {
             const url = URL.createObjectURL(blob);
             outputPreview.src = url;
             outputPreview.style.display = 'block';
+
+            // Setup Download
+            downloadBtn.href = url;
+            downloadBtn.download = `ColorSAR_Result_${Date.now()}.png`;
+            downloadBtn.style.display = 'inline-block';
+
+            colorizeBtn.textContent = 'Colorized!';
+            setTimeout(() => {
+                colorizeBtn.textContent = 'Colorize Image';
+                colorizeBtn.disabled = false;
+            }, 2000);
         } else {
             alert('Error during colorization: ' + response.statusText);
+            colorizeBtn.disabled = false;
+            colorizeBtn.textContent = 'Retry';
         }
     } catch (error) {
         console.error('Error:', error);
         alert('Could not connect to the API server.');
+        colorizeBtn.disabled = false;
     } finally {
         loader.style.display = 'none';
-        colorizeBtn.disabled = false;
     }
 };
