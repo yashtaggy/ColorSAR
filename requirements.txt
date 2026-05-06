@@ -1,10 +1,12 @@
 fastapi
 uvicorn
 python-multipart
+# CPU-only torch to save space on cloud runners
+--index-url https://download.pytorch.org/whl/cpu
 torch
 torchvision
 numpy
-opencv-python
+opencv-python-headless
 pillow
 scikit-image
 matplotlib
@@ -12,3 +14,4 @@ tqdm
 google-generativeai
 python-dotenv
 reportlab
+firebase-admin

@@ -22,8 +22,17 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 # Initialize Firebase Admin
 try:
-    cred = credentials.Certificate("serviceAccountKey.json")
-    firebase_admin.initialize_app(cred)
+    if os.path.exists("serviceAccountKey.json"):
+        cred = credentials.Certificate("serviceAccountKey.json")
+        firebase_admin.initialize_app(cred)
+    elif os.getenv("FIREBASE_SERVICE_ACCOUNT"):
+        import json
+        service_account_info = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
+        cred = credentials.Certificate(service_account_info)
+        firebase_admin.initialize_app(cred)
+        print("Firebase Admin: Initialized using environment variable.")
+    else:
+        print("Firebase Admin Warning: No service account key found (file or env var).")
 except Exception as e:
     print(f"Firebase Admin Warning: {e}")
 
@@ -172,6 +181,15 @@ async def generate_report(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+from fastapi.staticfiles import StaticFiles
+
+# ... (keep existing codes) ...
+
+# Mount static files (at the end of your app definitions)
+# Ensure this folder exists in your deployment
+if os.path.exists("frontend-dist"):
+    app.mount("/", StaticFiles(directory="frontend-dist", html=True), name="static")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

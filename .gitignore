@@ -21,8 +21,8 @@ frontend/.env*.local
 backend/build/
 backend/dist/
 backend/*.egg-info/
-backend/weights/*.pth
-backend/weights/*.pt
+# backend/weights/*.pth
+# backend/weights/*.pt
 
 # --- Environment & Secrets (CRITICAL SECURITY) ---
 **/.env
@@ -37,15 +37,15 @@ backend/weights/*.pt
 *.key
 
 # --- Machine Learning & Large Files ---
-# Ignore large model weights (100MB+ files fail GitHub push)
-backend/weights/
-*.pth
-*.pt
-*.h5
-*.onnx
-*.weights
-*.pkl
-*.joblib
+# Un-ignored for Git LFS usage (see .gitattributes)
+# backend/weights/
+# *.pth
+# *.pt
+# *.h5
+# *.onnx
+# *.weights
+# *.pkl
+# *.joblib
 
 # --- Jupyter Notebooks ---
 .ipynb_checkpoints/
