@@ -21,6 +21,10 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# --- Pre-download ResNet/DenseNet weights to avoid runtime download ---
+# This ensures the container starts FAST on Cloud Run
+RUN python3 -c "import torchvision.models as models; models.resnet50(weights='ResNet50_Weights.DEFAULT'); models.densenet121(weights='DenseNet121_Weights.DEFAULT')"
+
 # Copy backend code
 COPY backend/ ./backend/
 
