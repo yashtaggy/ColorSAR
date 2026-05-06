@@ -2,6 +2,12 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from torchvision.models import ResNet50_Weights, DenseNet121_Weights
+import os
+from PIL import Image
+import numpy as np
+import cv2
+from skimage.color import rgb2lab, lab2rgb
+from torchvision import transforms
 
 # --- Denoising Model (DnCNN) ---
 class DnCNN(nn.Module):
@@ -137,3 +143,69 @@ class ColorizationModel(nn.Module):
         features_56x56, features_28x28, features_14x14, features_7x7 = self.encoder(x)
         output = self.decoder(features_7x7, features_14x14, features_28x28, features_56x56)
         return output
+
+# --- Inference Support ---
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def load_models(color_pth, dncnn_pth):
+    encoder = EnsembleEncoder()
+    decoder = Decoder()
+    color_model = ColorizationModel(encoder, decoder).to(device)
+    dncnn_model = DnCNN().to(device)
+    
+    if os.path.exists(color_pth):
+        try:
+            color_model.load_state_dict(torch.load(color_pth, map_location=device, weights_only=False))
+        except:
+            color_model = torch.load(color_pth, map_location=device, weights_only=False)
+    
+    if os.path.exists(dncnn_pth):
+        try:
+            dncnn_model.load_state_dict(torch.load(dncnn_pth, map_location=device, weights_only=False))
+        except:
+            dncnn_model = torch.load(dncnn_pth, map_location=device, weights_only=False)
+            
+    color_model.eval()
+    dncnn_model.eval()
+    return color_model, dncnn_model
+
+def preprocess(image_bytes, target_size=(224, 224)):
+    img_pil = Image.open(image_bytes).convert('L')
+    original_size = img_pil.size
+    img_np = np.array(img_pil)
+    
+    img_resized = cv2.resize(img_np, target_size)
+    img_3ch = cv2.merge((img_resized, img_resized, img_resized))
+    
+    img_lab = rgb2lab(img_3ch).astype("float32")
+    img_lab_tensor = transforms.ToTensor()(img_lab)
+    
+    L_channel = img_lab_tensor[[0], ...]
+    L_scaled = 2 * (L_channel) / 100 - 1
+    
+    return L_scaled.unsqueeze(0).to(device), img_np, original_size
+
+def infer(color_model, dncnn_model, L_scaled, img_original_np, original_size):
+    with torch.no_grad():
+        denoised_L = dncnn_model(L_scaled)
+        denoised_L_3ch = torch.cat([denoised_L, denoised_L, denoised_L], dim=1)
+        ab_pred = color_model(denoised_L_3ch)
+        
+        # Initial postprocess (combine with original high-res L)
+        ab_pred_np = ab_pred.squeeze(0).cpu().numpy()
+        ab_pred_np = (ab_pred_np + 1) * 127.5 - 128
+        ab_pred_np = ab_pred_np.transpose(1, 2, 0)
+        
+        W, H = original_size
+        ab_upscaled = cv2.resize(ab_pred_np, (W, H), interpolation=cv2.INTER_CUBIC)
+        
+        L_lab = img_original_np.astype("float32") * 100.0 / 255.0
+        lab_high_res = np.zeros((H, W, 3), dtype="float32")
+        lab_high_res[:, :, 0] = L_lab
+        lab_high_res[:, :, 1:] = ab_upscaled
+        
+        with np.errstate(invalid='ignore'):
+            rgb = lab2rgb(lab_high_res.astype("float64"))
+        rgb = (rgb * 255).astype("uint8")
+        
+    return rgb

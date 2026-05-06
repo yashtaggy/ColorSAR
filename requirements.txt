@@ -9,3 +9,6 @@ pillow
 scikit-image
 matplotlib
 tqdm
+google-generativeai
+python-dotenv
+reportlab

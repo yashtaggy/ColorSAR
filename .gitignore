@@ -1,28 +1,71 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-env/
-.venv/
-venv/
-build/
-dist/
+# ==========================================
+# ColorSAR - Project Git Ignore
+# ==========================================
 
-# PyTorch Models (Crucial to ignore large files)
+# --- Node.js / Frontend ---
+**/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+frontend/.env*.local
+
+# --- Python / Backend ---
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.venv/
+**/venv/
+**/env/
+backend/build/
+backend/dist/
+backend/*.egg-info/
+backend/weights/*.pth
+backend/weights/*.pt
+
+# --- Environment & Secrets (CRITICAL SECURITY) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/*serviceAccountKey.json
+**/firebase-key.json
+*.pem
+*.key
+
+# --- Machine Learning & Large Files ---
+# Ignore large model weights (100MB+ files fail GitHub push)
+backend/weights/
 *.pth
 *.pt
+*.h5
+*.onnx
+*.weights
+*.pkl
+*.joblib
 
-# Application Temp Files
-temp_input.png
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# --- Build Archives & Logs ---
 *.log
+*.tmp
+*.bak
+v_2/
+old_version/
+temp_input.png
 
-# IDEs
+# --- IDEs & System ---
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
 
-# Jupyter Notebooks
-.ipynb_checkpoints
-
-v_2
+# --- Vercel ---
+.vercel/
 
