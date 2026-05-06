@@ -2,7 +2,7 @@ fastapi
 uvicorn
 python-multipart
 # CPU-only torch to save space on cloud runners
---index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 torchvision
 numpy
