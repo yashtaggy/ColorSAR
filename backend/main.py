@@ -45,38 +45,56 @@ async def get_current_user(res: HTTPAuthorizationCredentials = Depends(security)
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
-# Global model state
+# Global model state (Lazy Loaded)
 models = {"color": None, "dncnn": None}
+import threading
+model_lock = threading.Lock()
+
+def get_models():
+    """Thread-safe lazy loader for models."""
+    global models
+    if models["color"] is not None:
+        return models["color"], models["dncnn"]
+    
+    with model_lock:
+        if models["color"] is None:
+            print("Startup: First request received. Loading heavy AI models...")
+            # Search paths for weights
+            search_paths = [
+                "weights",
+                "backend/weights",
+                "../weights",
+                "backend/weights",
+                "/app/backend/weights",
+                ".",
+                ".."
+            ]
+            
+            color_pth = None
+            dncnn_pth = None
+            
+            for path in search_paths:
+                c_test = os.path.join(path, "color_model.pth")
+                d_test = os.path.join(path, "dcnn.pth")
+                if os.path.exists(c_test) and not color_pth:
+                    color_pth = c_test
+                if os.path.exists(d_test) and not dncnn_pth:
+                    dncnn_pth = d_test
+                    
+            if not color_pth: color_pth = "color_model.pth"
+            if not dncnn_pth: dncnn_pth = "dcnn.pth"
+                
+            models["color"], models["dncnn"] = load_models(color_pth, dncnn_pth)
+            print(f"Models loaded successfully from {color_pth} and {dncnn_pth}")
+            
+    return models["color"], models["dncnn"]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Search paths for weights
-    search_paths = [
-        "weights",
-        "backend/weights",
-        "../weights",
-        ".",
-        ".."
-    ]
-    
-    color_pth = None
-    dncnn_pth = None
-    
-    for path in search_paths:
-        c_test = os.path.join(path, "color_model.pth")
-        d_test = os.path.join(path, "dcnn.pth")
-        if os.path.exists(c_test) and not color_pth:
-            color_pth = c_test
-        if os.path.exists(d_test) and not dncnn_pth:
-            dncnn_pth = d_test
-            
-    if not color_pth: color_pth = "color_model.pth"
-    if not dncnn_pth: dncnn_pth = "dcnn.pth"
-        
-    models["color"], models["dncnn"] = load_models(color_pth, dncnn_pth)
-    print(f"Models loaded from {color_pth} and {dncnn_pth}")
+    # Instant startup: We don't load models here anymore to avoid Cloud Run timeouts
+    print("Health: Server is up and listening.")
     yield
-    # Clean up if needed
+    # Clean up
     models["color"] = None
     models["dncnn"] = None
 
@@ -106,7 +124,8 @@ async def process_image(
         L_scaled, img_original_np, original_size = preprocess(io.BytesIO(content))
         
         # 2. Model Inference
-        colorized_rgb = infer(models["color"], models["dncnn"], L_scaled, img_original_np, original_size)
+        color_model, dncnn_model = get_models()
+        colorized_rgb = infer(color_model, dncnn_model, L_scaled, img_original_np, original_size)
         
         analysis = None
         final_image_rgb = colorized_rgb
