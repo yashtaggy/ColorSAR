@@ -4,13 +4,14 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // TODO: Replace with your actual Firebase config
+// Use environment variables for safety
 const firebaseConfig = {
-    apiKey: "AIzaSyADPe3r4GO_MvsWJkhWMTSOuSmyTU7jL3I",
-    authDomain: "colorsar-310d1.firebaseapp.com",
-    projectId: "colorsar-310d1",
-    storageBucket: "colorsar-310d1.firebasestorage.app",
-    messagingSenderId: "169811356225",
-    appId: "1:169811356225:web:dab4bbb5ed668f784ab4c0"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
