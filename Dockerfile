@@ -1,27 +1,28 @@
 # --- Stage 1: Build Frontend ---
 FROM node:20-slim AS frontend-builder
 
-# Set build-time arguments for Vite (mandatory for React to see them)
-ARG VITE_FIREBASE_API_KEY
-ARG VITE_FIREBASE_AUTH_DOMAIN
-ARG VITE_FIREBASE_PROJECT_ID
-ARG VITE_FIREBASE_STORAGE_BUCKET
-ARG VITE_FIREBASE_MESSAGING_SENDER_ID
-ARG VITE_FIREBASE_APP_ID
-
-# Make them available as ENV during 'npm run build'
-ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
-ENV VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
-ENV VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
-ENV VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET
-ENV VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
-ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
+# Arguments passed from gcloud builds submit --substitutions
+ARG _API_KEY
+ARG _AUTH_DOMAIN
+ARG _PROJECT_ID
+ARG _STORAGE_BUCKET
+ARG _SENDER_ID
+ARG _APP_ID
 
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
-# Build React app (output goes to /app/frontend/dist)
+
+# Create .env file dynamically during build to ensure Vite captures it
+RUN echo "VITE_FIREBASE_API_KEY=${_API_KEY}" > .env && \
+    echo "VITE_FIREBASE_AUTH_DOMAIN=${_AUTH_DOMAIN}" >> .env && \
+    echo "VITE_FIREBASE_PROJECT_ID=${_PROJECT_ID}" >> .env && \
+    echo "VITE_FIREBASE_STORAGE_BUCKET=${_STORAGE_BUCKET}" >> .env && \
+    echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${_SENDER_ID}" >> .env && \
+    echo "VITE_FIREBASE_APP_ID=${_APP_ID}" >> .env
+
+# Build React app (Vite will now pick up the .env we just created)
 RUN npm run build
 
 # --- Stage 2: Build Backend & Final Image ---
